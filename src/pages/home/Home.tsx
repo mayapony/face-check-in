@@ -1,3 +1,3 @@
 export const Home = () => {
-  return <h1 className="text-3xl font-bold underline">Home</h1>;
+  return <div className="grow bg-gray-400">Home</div>;
 };
