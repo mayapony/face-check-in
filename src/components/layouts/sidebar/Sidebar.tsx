@@ -14,10 +14,7 @@ export const Sidebar = () => {
   return (
     <div className="sidebar w-60">
       <div className="top">
-        <img
-          className="w-3/4"
-          src="https://see.fontimg.com/api/renderfont4/L3jyW/eyJyIjoiZnMiLCJoIjo5OCwidyI6MTUwMCwiZnMiOjY1LCJmZ2MiOiIjN0EyNEM3IiwiYmdjIjoiI0ZGRkZGRiIsInQiOjF9/RGFzaGJvYXJk/farmshed.png"
-        />
+        <h1 className="text-2xl font-bold text-violet-600">签到系统后台</h1>
       </div>
       <hr />
       <div className="center text-base">
@@ -27,7 +24,7 @@ export const Sidebar = () => {
             <DashboardIcon className="icon" />
             <span>控制台</span>
           </li>
-          <SidebarTitle text="LISTS" />
+          <SidebarTitle text="列表" />
           <li>
             <PersonIcon className="icon" />
             <span>用户管理</span>
@@ -36,7 +33,7 @@ export const Sidebar = () => {
             <FilterFramesIcon className="icon" />
             <span>签到记录</span>
           </li>
-          <SidebarTitle text="USEFUL" />
+          <SidebarTitle text="工具" />
           <li>
             <LeaderboardIcon className="icon" />
             <span>统计信息</span>
@@ -45,7 +42,7 @@ export const Sidebar = () => {
             <NotificationsNoneIcon className="icon" />
             <span>消息通知</span>
           </li>
-          <SidebarTitle text="SERVICE" />
+          <SidebarTitle text="服务" />
           <li>
             <NotesIcon className="icon" />
             <span>系统日志</span>
@@ -54,7 +51,7 @@ export const Sidebar = () => {
             <SettingsIcon className="icon" />
             <span>系统设置</span>
           </li>
-          <SidebarTitle text="USER" />
+          <SidebarTitle text="用户" />
           <li>
             <AccountBoxIcon className="icon" />
             <span>个人信息</span>
