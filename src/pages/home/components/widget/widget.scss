@@ -1,0 +1,77 @@
+.widget {
+  display: flex;
+  flex: 1;
+  margin: 10px;
+  padding: 10px;
+  justify-content: space-between;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border-radius: 10px;
+  height: 120px;
+
+  .left,
+  .right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: grey;
+
+    .title {
+      font-weight: bold;
+      font-size: 14px;
+      color: rgb(179, 178, 178);
+    }
+
+    .counter {
+      font-size: 28px;
+      font-weight: 300;
+    }
+
+    .link {
+      width: max-content;
+      font-size: 12px;
+      border-bottom: 1px solid grey;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    .percentage {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+
+      &.positive {
+        color: green;
+      }
+      &.negative {
+        color: red;
+      }
+    }
+
+    .icon {
+      font-size: 20px;
+      align-self: flex-end;
+      border-radius: 5px;
+      padding: 3px;
+
+      &.icon-user {
+        background-color: rgb(243, 174, 188);
+        color: crimson;
+      }
+      &.icon-order {
+        background-color: rgba(4, 195, 4, 0.477);
+        color: green;
+      }
+      &.icon-earning {
+        background-color: rgba(255, 217, 0, 0.551);
+        color: rgb(176, 150, 2);
+      }
+      &.icon-balance {
+        background-color: rgba(192, 91, 192, 0.58);
+        color: rgb(183, 34, 183);
+      }
+    }
+  }
+}
