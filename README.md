@@ -2,7 +2,7 @@
 
 ## 登陆页面
 
-![登陆页面](./docs/images/login-page.jpg)
+![登陆页面](./docs/images/login.jpg)
 
 ## 首页 🚧
 
