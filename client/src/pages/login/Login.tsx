@@ -1,22 +1,36 @@
-import { API_BASE } from "@/global";
+import { API_BASE, LOGIN_OPTIONS } from "@/global";
 import CloseIcon from "@mui/icons-material/Close";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import {
   Alert,
   Backdrop,
   Button,
+  ButtonGroup,
   CircularProgress,
+  ClickAwayListener,
   Collapse,
+  Grow,
   IconButton,
+  MenuItem,
+  MenuList,
+  Paper,
+  Popper,
   TextField,
 } from "@mui/material";
 import axios from "axios";
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { localSet } from "@/utils";
+
+const options = LOGIN_OPTIONS;
 
 export const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [enableBackdrop, setEnableBackdrop] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(1);
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
 
@@ -42,7 +56,8 @@ export const Login = () => {
         .post(`${API_BASE}/users`, postData)
         .then((res) => {
           console.log(res);
-          navigate("/home");
+          if (selectedIndex === 0) navigate("/upload");
+          else navigate("/home");
         })
         .catch((error) => {
           console.error(error);
@@ -55,7 +70,10 @@ export const Login = () => {
         .then((res) => {
           console.log(res);
           if (res.data) {
-            navigate("/home");
+            localSet("role", selectedIndex.toString());
+            localSet("name", res.data.name);
+            if (selectedIndex === 0) navigate("/upload");
+            else navigate("/home");
           } else {
             throw "帐号或密码错误";
           }
@@ -119,9 +137,74 @@ export const Login = () => {
             </>
           )}
 
-          <Button variant="contained" type="submit">
-            {isLogin ? "登 陆" : "注册"}
-          </Button>
+          <div className="w-full">
+            <ButtonGroup
+              variant="contained"
+              ref={anchorRef}
+              aria-label="split button"
+              className="w-full"
+            >
+              <Button type="submit" className="w-full">
+                {options[selectedIndex] + "登陆"}
+              </Button>
+              <Button
+                size="small"
+                aria-controls={open ? "split-button-menu" : undefined}
+                aria-expanded={open ? "true" : undefined}
+                aria-label="select merge strategy"
+                aria-haspopup="menu"
+                onClick={() => {
+                  setOpen(!open);
+                }}
+              >
+                <ArrowDropDownIcon />
+              </Button>
+            </ButtonGroup>
+            <Popper
+              sx={{
+                zIndex: 1,
+              }}
+              open={open}
+              anchorEl={anchorRef.current}
+              role={undefined}
+              transition
+              disablePortal
+            >
+              {({ TransitionProps, placement }) => (
+                <Grow
+                  {...TransitionProps}
+                  style={{
+                    transformOrigin:
+                      placement === "bottom" ? "center top" : "center bottom",
+                  }}
+                >
+                  <Paper>
+                    <ClickAwayListener
+                      onClickAway={() => {
+                        setOpen(false);
+                      }}
+                    >
+                      <MenuList id="split-button-menu" autoFocusItem>
+                        {options.map((option, index) => (
+                          <MenuItem
+                            key={option}
+                            disabled={index === 2}
+                            selected={index === selectedIndex}
+                            onClick={() => {
+                              setSelectedIndex(index);
+                              setOpen(false);
+                            }}
+                          >
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Grow>
+              )}
+            </Popper>
+          </div>
 
           <p
             className=" w-max self-end text-sm text-gray-400 hover:cursor-pointer"
