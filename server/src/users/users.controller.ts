@@ -14,6 +14,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+import { GlobalService } from '../utils/global.service';
 
 @Controller('users')
 export class UsersController {
@@ -38,11 +39,6 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
@@ -58,5 +54,10 @@ export class UsersController {
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     console.log(file.originalname);
     return true;
+  }
+
+  @Get('descriptors')
+  findDescriptors() {
+    return GlobalService.labeledFaceDescriptors;
   }
 }

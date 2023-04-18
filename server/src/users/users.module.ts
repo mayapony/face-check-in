@@ -5,6 +5,7 @@ import * as multer from 'multer';
 import { User } from './entities/user.entity';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { GlobalService } from '../utils/global.service';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UsersService } from './users.service';
         },
       }),
     }),
+    GlobalService,
   ],
   controllers: [UsersController],
   providers: [UsersService],

@@ -3,7 +3,7 @@ import { API_BASE } from "@/global";
 import { localGet } from "@/utils";
 import axios from "axios";
 import * as faceapi from "face-api.js";
-import { FaceDetection } from "face-api.js";
+import { FaceDetection, FaceMatch, LabeledFaceDescriptors } from "face-api.js";
 import { useEffect, useRef, useState } from "react";
 
 export const Upload = () => {
@@ -15,13 +15,15 @@ export const Upload = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const intervalIdRef = useRef<null | NodeJS.Timer>(null);
   const detectionsRef = useRef<null | FaceDetection>(null);
+  const MODEL_URL = "/models";
 
   useEffect(() => {
     initElementStyle();
+    loadModels();
+    startVideo();
   }, []);
 
   const loadModels = async () => {
-    const MODEL_URL = "/models";
     setInitializing(true);
 
     Promise.all([
@@ -29,7 +31,7 @@ export const Upload = () => {
       faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
       faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
       faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
-    ]).then(startVideo);
+    ]);
   };
 
   const initElementStyle = () => {
@@ -60,6 +62,69 @@ export const Upload = () => {
   };
 
   const handleVideoPlay = () => {
+    matchAndDrawName();
+  };
+
+  const matchAndDrawName = async () => {
+    await faceapi.loadSsdMobilenetv1Model(MODEL_URL);
+    await faceapi.loadFaceLandmarkModel(MODEL_URL);
+    await faceapi.loadFaceRecognitionModel(MODEL_URL);
+
+    let labeledFaceDescriptors = (
+      await axios.get(`${API_BASE}/users/descriptors`)
+    ).data as LabeledFaceDescriptors[];
+    labeledFaceDescriptors = labeledFaceDescriptors.map((des) => {
+      return new LabeledFaceDescriptors(des.label, [
+        new Float32Array(des.descriptors[0]),
+      ]);
+    });
+    console.log(labeledFaceDescriptors);
+
+    const flag = 0;
+    const FACE_PASS = 1;
+    const FACE_ERROR = -1;
+    const FACE_NORMAL = 0;
+
+    setInterval(async () => {
+      setInitializing(false);
+      if (videoRef.current && canvasRef.current) {
+        const canvas = canvasRef.current;
+        const displaySize = {
+          width: videoSize,
+          height: videoSize,
+        };
+
+        faceapi.matchDimensions(canvasRef.current, displaySize);
+
+        const fullFaceDescriptions = await faceapi
+          .detectAllFaces(videoRef.current)
+          .withFaceLandmarks()
+          .withFaceDescriptors();
+        faceapi.draw.drawDetections(canvas, fullFaceDescriptions);
+
+        const maxDescriptorDistance = 0.6;
+        const faceMatcher = new faceapi.FaceMatcher(
+          labeledFaceDescriptors,
+          maxDescriptorDistance
+        );
+
+        const results = fullFaceDescriptions.map((fd) =>
+          faceMatcher.findBestMatch(fd.descriptor)
+        );
+
+        console.log(results);
+
+        results.forEach((bestMatch: FaceMatch, i: number) => {
+          const box = fullFaceDescriptions[i].detection.box;
+          const text = bestMatch.toString();
+          const drawBox = new faceapi.draw.DrawBox(box, { label: text });
+          drawBox.draw(canvas);
+        });
+      }
+    }, 3000);
+  };
+
+  const drawDetectAndFaceLandmark = () => {
     intervalIdRef.current = setInterval(async () => {
       setInitializing(false);
       if (videoRef.current && canvasRef.current) {
@@ -93,7 +158,7 @@ export const Upload = () => {
   };
 
   const handleUpdateImage = () => {
-    loadModels();
+    drawDetectAndFaceLandmark();
   };
 
   const handleStop = () => {

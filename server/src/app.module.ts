@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -6,6 +7,8 @@ import { AppService } from './app.service';
 import { User } from './users/entities/user.entity';
 import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
+
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -20,6 +23,10 @@ import { UsersModule } from './users/users.module';
       synchronize: true,
     }),
     UsersModule,
+    // source from https://stackoverflow.com/questions/63429380/how-to-serve-static-images-in-nestjs
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'files'),
+    }),
   ],
   controllers: [AppController, UsersController],
   providers: [AppService],
