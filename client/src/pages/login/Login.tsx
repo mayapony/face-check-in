@@ -18,9 +18,9 @@ import {
   TextField,
 } from "@mui/material";
 import axios from "axios";
-import { SyntheticEvent, useRef, useState } from "react";
+import { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { localSet } from "@/utils";
+import { localGet, localSet } from "@/utils";
 
 const options = LOGIN_OPTIONS;
 
@@ -33,6 +33,15 @@ export const Login = () => {
   const anchorRef = useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(localGet("role"));
+    if (localGet("role")?.toString() === "0") {
+      navigate("/upload");
+    } else if (localGet("role")?.toString() === "1") {
+      navigate("/home");
+    }
+  }, []);
 
   const handleSubmit = (event: SyntheticEvent) => {
     event.preventDefault();
@@ -72,6 +81,7 @@ export const Login = () => {
           if (res.data) {
             localSet("role", selectedIndex.toString());
             localSet("name", res.data.name);
+            localSet("userID", res.data.id);
             if (selectedIndex === 0) navigate("/upload");
             else navigate("/home");
           } else {

@@ -1,4 +1,4 @@
-import { localGet } from "@/utils";
+import { localClear, localGet } from "@/utils";
 import ChatIcon from "@mui/icons-material/Chat";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
@@ -8,13 +8,16 @@ import SearchIcon from "@mui/icons-material/Search";
 import {
   Avatar,
   Button,
+  IconButton,
   styled,
   Tooltip,
   tooltipClasses,
   TooltipProps,
 } from "@mui/material";
 import { blue } from "@mui/material/colors";
+import LogoutIcon from "@mui/icons-material/Logout";
 import "./navbar.scss";
+import { useNavigate } from "react-router-dom";
 
 const AdminButtonGroup = () => {
   return (
@@ -54,11 +57,19 @@ const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
 
 export const Navbar = ({
   handleUpdateImage,
+  handleUpdateInfo,
 }: {
-  handleUpdateImage: () => void;
+  handleUpdateImage?: () => void;
+  handleUpdateInfo?: () => void;
 }) => {
   const isAdmin = localGet("role") !== "0";
   const avatarSize = isAdmin ? 24 : 52;
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localClear();
+    navigate("/login");
+  };
 
   return (
     <div className="navbar">
@@ -77,10 +88,17 @@ export const Navbar = ({
             <HtmlTooltip
               arrow
               title={
-                <>
-                  <Button>更新信息</Button>
+                <div>
+                  <Button onClick={handleUpdateInfo}>更新信息</Button>
                   <Button onClick={handleUpdateImage}>更新照片</Button>
-                </>
+                  <IconButton
+                    onClick={() => {
+                      handleLogout();
+                    }}
+                  >
+                    <LogoutIcon color="primary" />
+                  </IconButton>
+                </div>
               }
             >
               <Avatar

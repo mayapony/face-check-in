@@ -1,9 +1,21 @@
 import { Navbar } from "@/components/layouts/navbar/navbar";
 import { API_BASE } from "@/global";
 import { localGet } from "@/utils";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+} from "@mui/material";
 import axios from "axios";
 import * as faceapi from "face-api.js";
-import { FaceDetection, FaceMatch, LabeledFaceDescriptors } from "face-api.js";
+import { FaceDetection } from "face-api.js";
 import { useEffect, useRef, useState } from "react";
 
 export const Upload = () => {
@@ -11,19 +23,43 @@ export const Upload = () => {
   const videoSize = 480;
   const [initializing, setInitializing] = useState(false);
   const [haveFace, setHaveFace] = useState(false);
+  const [activityID, setActivityID] = useState("");
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const intervalIdRef = useRef<null | NodeJS.Timer>(null);
   const detectionsRef = useRef<null | FaceDetection>(null);
-  const MODEL_URL = "/models";
+  const activitysRef = useRef<any[]>([]);
+
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     initElementStyle();
-    loadModels();
-    startVideo();
+    loadActivitys();
   }, []);
 
+  const handleChange = (event: SelectChangeEvent) => {
+    setActivityID(event.target.value);
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const loadActivitys = () => {
+    axios.get(`${API_BASE}/activitys`).then((res) => {
+      if (res.data) {
+        activitysRef.current = res.data;
+      }
+    });
+  };
+
   const loadModels = async () => {
+    const MODEL_URL = "/models";
     setInitializing(true);
 
     Promise.all([
@@ -31,7 +67,7 @@ export const Upload = () => {
       faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
       faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
       faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
-    ]);
+    ]).then(startVideo);
   };
 
   const initElementStyle = () => {
@@ -62,69 +98,6 @@ export const Upload = () => {
   };
 
   const handleVideoPlay = () => {
-    matchAndDrawName();
-  };
-
-  const matchAndDrawName = async () => {
-    await faceapi.loadSsdMobilenetv1Model(MODEL_URL);
-    await faceapi.loadFaceLandmarkModel(MODEL_URL);
-    await faceapi.loadFaceRecognitionModel(MODEL_URL);
-
-    let labeledFaceDescriptors = (
-      await axios.get(`${API_BASE}/users/descriptors`)
-    ).data as LabeledFaceDescriptors[];
-    labeledFaceDescriptors = labeledFaceDescriptors.map((des) => {
-      return new LabeledFaceDescriptors(des.label, [
-        new Float32Array(des.descriptors[0]),
-      ]);
-    });
-    console.log(labeledFaceDescriptors);
-
-    const flag = 0;
-    const FACE_PASS = 1;
-    const FACE_ERROR = -1;
-    const FACE_NORMAL = 0;
-
-    setInterval(async () => {
-      setInitializing(false);
-      if (videoRef.current && canvasRef.current) {
-        const canvas = canvasRef.current;
-        const displaySize = {
-          width: videoSize,
-          height: videoSize,
-        };
-
-        faceapi.matchDimensions(canvasRef.current, displaySize);
-
-        const fullFaceDescriptions = await faceapi
-          .detectAllFaces(videoRef.current)
-          .withFaceLandmarks()
-          .withFaceDescriptors();
-        faceapi.draw.drawDetections(canvas, fullFaceDescriptions);
-
-        const maxDescriptorDistance = 0.6;
-        const faceMatcher = new faceapi.FaceMatcher(
-          labeledFaceDescriptors,
-          maxDescriptorDistance
-        );
-
-        const results = fullFaceDescriptions.map((fd) =>
-          faceMatcher.findBestMatch(fd.descriptor)
-        );
-
-        console.log(results);
-
-        results.forEach((bestMatch: FaceMatch, i: number) => {
-          const box = fullFaceDescriptions[i].detection.box;
-          const text = bestMatch.toString();
-          const drawBox = new faceapi.draw.DrawBox(box, { label: text });
-          drawBox.draw(canvas);
-        });
-      }
-    }, 3000);
-  };
-
-  const drawDetectAndFaceLandmark = () => {
     intervalIdRef.current = setInterval(async () => {
       setInitializing(false);
       if (videoRef.current && canvasRef.current) {
@@ -158,7 +131,7 @@ export const Upload = () => {
   };
 
   const handleUpdateImage = () => {
-    drawDetectAndFaceLandmark();
+    loadModels();
   };
 
   const handleStop = () => {
@@ -208,7 +181,10 @@ export const Upload = () => {
 
   return (
     <div className=" flex h-screen w-full flex-col items-center bg-blue-300">
-      <Navbar handleUpdateImage={handleUpdateImage} />
+      <Navbar
+        handleUpdateImage={handleUpdateImage}
+        handleUpdateInfo={handleClickOpen}
+      />
       <div
         className="relative w-96 overflow-hidden rounded-full  border-4 border-blue-900 bg-black"
         id="container"
@@ -241,6 +217,56 @@ export const Upload = () => {
           上 传
         </button>
       </div>
+
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>更新信息</DialogTitle>
+        <DialogContent sx={{ maxWidth: "500px" }}>
+          <form className="w-full">
+            <FormControl fullWidth>
+              <InputLabel id="inputLabelID" className="my-2">
+                活动
+              </InputLabel>
+              <Select
+                labelId="inputLabelID"
+                label="Age"
+                sx={{ width: "400px" }}
+                value={activityID}
+                onChange={handleChange}
+                className="my-2"
+              >
+                {activitysRef.current.map((activity) => (
+                  <MenuItem value={activity.id} key={activity.id}>
+                    {activity.name}
+                  </MenuItem>
+                ))}
+              </Select>
+
+              <TextField
+                autoFocus
+                margin="dense"
+                label="参加密码"
+                type="password"
+                fullWidth
+                required
+                variant="outlined"
+              />
+
+              <div className="flex w-full flex-row-reverse">
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{ marginLeft: "10px" }}
+                >
+                  提交
+                </Button>
+                <Button onClick={handleClose} variant="contained">
+                  取消
+                </Button>
+              </div>
+            </FormControl>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

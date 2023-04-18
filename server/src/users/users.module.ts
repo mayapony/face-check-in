@@ -6,10 +6,12 @@ import { User } from './entities/user.entity';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { GlobalService } from '../utils/global.service';
+import { ActivitysModule } from 'src/activitys/activitys.module';
+import { Activity } from 'src/activitys/entities/activity.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Activity]),
     MulterModule.register({
       storage: multer.diskStorage({
         destination: function (req, file, cb) {
@@ -20,6 +22,7 @@ import { GlobalService } from '../utils/global.service';
         },
       }),
     }),
+    ActivitysModule,
     GlobalService,
   ],
   controllers: [UsersController],

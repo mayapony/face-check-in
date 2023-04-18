@@ -15,6 +15,7 @@ import { LoginUserDto } from './dto/login-user';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { GlobalService } from '../utils/global.service';
+import { JoinActivityDto } from './dto/join-activity.dto';
 
 @Controller('users')
 export class UsersController {
@@ -40,8 +41,8 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  update(@Param('id') id: string) {
+    return this.usersService.update(+id);
   }
 
   @Delete(':id')
@@ -59,5 +60,11 @@ export class UsersController {
   @Get('descriptors')
   findDescriptors() {
     return GlobalService.labeledFaceDescriptors;
+  }
+
+  @Post('join')
+  join(@Body() joinActivityDto: JoinActivityDto) {
+    console.log(joinActivityDto);
+    return this.usersService.join(joinActivityDto);
   }
 }

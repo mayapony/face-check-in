@@ -9,18 +9,27 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { zhCN } from "@mui/material/locale";
+import { zhCN as dateZhCN } from "@mui/x-date-pickers/locales";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import * as dayjs from "dayjs";
+import "dayjs/locale/zh-cn";
+dayjs.locale("zh-cn"); // use locale
 
 const theme = createTheme(
   {
     palette: {},
   },
-  zhCN
+  zhCN,
+  dateZhCN
 );
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <RouterProvider router={router} />
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-cn">
+        <RouterProvider router={router} />
+      </LocalizationProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

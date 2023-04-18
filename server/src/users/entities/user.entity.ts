@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Activity } from 'src/activitys/entities/activity.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -19,4 +20,7 @@ export class User {
 
   @Column({ default: false })
   isAdmin: boolean;
+
+  @ManyToOne(() => Activity, (activity) => activity.users)
+  activity: Activity;
 }

@@ -9,6 +9,9 @@ import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 
 import { join } from 'path';
+import { ActivitysModule } from './activitys/activitys.module';
+import { ActivitysController } from './activitys/activitys.controller';
+import { Activity } from './activitys/entities/activity.entity';
 
 @Module({
   imports: [
@@ -19,7 +22,7 @@ import { join } from 'path';
       username: 'admin',
       password: 'admin',
       database: 'face',
-      entities: [User],
+      entities: [User, Activity],
       synchronize: true,
     }),
     UsersModule,
@@ -27,8 +30,9 @@ import { join } from 'path';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'files'),
     }),
+    ActivitysModule,
   ],
-  controllers: [AppController, UsersController],
+  controllers: [AppController, UsersController, ActivitysController],
   providers: [AppService],
 })
 export class AppModule {}

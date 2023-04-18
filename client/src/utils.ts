@@ -14,4 +14,3 @@ export const localClear = () => {
   localRemove("role");
   localRemove("name");
 };
-
