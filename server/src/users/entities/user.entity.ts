@@ -18,8 +18,8 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ default: false })
-  isAdmin: boolean;
+  @Column({ default: 0 })
+  isAdmin: number;
 
   @ManyToOne(() => Activity, (activity) => activity.users)
   activity: Activity;

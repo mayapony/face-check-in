@@ -33,8 +33,17 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  findOne(id: number): Promise<User | null> {
-    return this.usersRepository.findOneBy({ id });
+  async findOne(id: number): Promise<User | null> {
+    const user = this.usersRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        activity: true,
+      },
+    });
+
+    return user;
   }
 
   update(id: number) {

@@ -12,7 +12,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { GlobalService } from '../utils/global.service';
 import { JoinActivityDto } from './dto/join-activity.dto';
@@ -38,6 +37,11 @@ export class UsersController {
   @Get()
   async findAll() {
     return await this.usersService.findAll();
+  }
+
+  @Get('one/:id')
+  async findOne(@Param('id') id: number) {
+    return await this.usersService.findOne(id);
   }
 
   @Patch(':id')

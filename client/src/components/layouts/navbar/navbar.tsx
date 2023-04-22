@@ -106,6 +106,8 @@ export const Navbar = ({
                   width: avatarSize,
                   height: avatarSize,
                   bgcolor: blue[600],
+                  fontSize: "18px",
+                  textAlign: "center",
                 }}
                 className="hover:cursor-pointer"
               >

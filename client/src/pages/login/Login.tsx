@@ -20,7 +20,7 @@ import {
 import axios from "axios";
 import { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { localGet, localSet } from "@/utils";
+import { localGet, localSave } from "@/utils";
 
 const options = LOGIN_OPTIONS;
 
@@ -28,18 +28,19 @@ export const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [enableBackdrop, setEnableBackdrop] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(1);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(localGet("role"));
     if (localGet("role")?.toString() === "0") {
       navigate("/upload");
     } else if (localGet("role")?.toString() === "1") {
       navigate("/home");
+    } else {
+      navigate("/login");
     }
   }, []);
 
@@ -58,13 +59,17 @@ export const Login = () => {
       phoneNumber: target.phoneNumber.value,
       name: target.name.value,
       password: target.password.value,
+      isAdmin: selectedIndex,
     };
+
+    console.log(postData);
     if (!isLogin) {
       // 注册
       axios
         .post(`${API_BASE}/users`, postData)
         .then((res) => {
-          console.log(res);
+          const data = res.data;
+          localSave(data.name, data.isAdmin, data.id);
           if (selectedIndex === 0) navigate("/upload");
           else navigate("/home");
         })
@@ -77,11 +82,10 @@ export const Login = () => {
       axios
         .post(`${API_BASE}/users/login`, postData)
         .then((res) => {
-          console.log(res);
           if (res.data) {
-            localSet("role", selectedIndex.toString());
-            localSet("name", res.data.name);
-            localSet("userID", res.data.id);
+            const data = res.data;
+            console.log(data);
+            localSave(data.name, data.isAdmin, data.id);
             if (selectedIndex === 0) navigate("/upload");
             else navigate("/home");
           } else {
@@ -137,7 +141,12 @@ export const Login = () => {
           />
           {!isLogin && (
             <>
-              <TextField label="重复密码" variant="outlined" required />
+              <TextField
+                label="重复密码"
+                variant="outlined"
+                type="password"
+                required
+              />
               <TextField
                 label="姓 名"
                 variant="outlined"
@@ -155,7 +164,7 @@ export const Login = () => {
               className="w-full"
             >
               <Button type="submit" className="w-full">
-                {options[selectedIndex] + "登陆"}
+                {options[selectedIndex] + (isLogin ? "登陆" : "注册")}
               </Button>
               <Button
                 size="small"

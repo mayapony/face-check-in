@@ -1,45 +1,41 @@
 import { Navbar } from "@/components/layouts/navbar/navbar";
 import { API_BASE } from "@/global";
 import { localGet } from "@/utils";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  TextField,
-} from "@mui/material";
 import axios from "axios";
 import * as faceapi from "face-api.js";
 import { FaceDetection } from "face-api.js";
 import { useEffect, useRef, useState } from "react";
+import { UploadDialog } from "./UploadDialog";
 
 export const Upload = () => {
   const videoRadio = 1280 / 720;
   const videoSize = 480;
   const [initializing, setInitializing] = useState(false);
   const [haveFace, setHaveFace] = useState(false);
-  const [activityID, setActivityID] = useState("");
+  const [checkedActivity, setCheckedActivity] = useState("");
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const intervalIdRef = useRef<null | NodeJS.Timer>(null);
   const detectionsRef = useRef<null | FaceDetection>(null);
-  const activitysRef = useRef<any[]>([]);
 
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     initElementStyle();
-    loadActivitys();
+    loadCheckedActivity();
   }, []);
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setActivityID(event.target.value);
+  const loadCheckedActivity = () => {
+    axios
+      .get(`${API_BASE}/users/one/${localGet("userID")}`)
+      .then(({ data }) => {
+        if (data) {
+          if (data.activity) {
+            setCheckedActivity(data.activity.name);
+          }
+        }
+      });
   };
 
   const handleClickOpen = () => {
@@ -48,14 +44,6 @@ export const Upload = () => {
 
   const handleClose = () => {
     setOpen(false);
-  };
-
-  const loadActivitys = () => {
-    axios.get(`${API_BASE}/activitys`).then((res) => {
-      if (res.data) {
-        activitysRef.current = res.data;
-      }
-    });
   };
 
   const loadModels = async () => {
@@ -218,55 +206,15 @@ export const Upload = () => {
         </button>
       </div>
 
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>更新信息</DialogTitle>
-        <DialogContent sx={{ maxWidth: "500px" }}>
-          <form className="w-full">
-            <FormControl fullWidth>
-              <InputLabel id="inputLabelID" className="my-2">
-                活动
-              </InputLabel>
-              <Select
-                labelId="inputLabelID"
-                label="Age"
-                sx={{ width: "400px" }}
-                value={activityID}
-                onChange={handleChange}
-                className="my-2"
-              >
-                {activitysRef.current.map((activity) => (
-                  <MenuItem value={activity.id} key={activity.id}>
-                    {activity.name}
-                  </MenuItem>
-                ))}
-              </Select>
+      <h1 className="text-lg font-bold">
+        {checkedActivity ? `已参加活动：${checkedActivity}` : "暂未选择活动！"}
+      </h1>
 
-              <TextField
-                autoFocus
-                margin="dense"
-                label="参加密码"
-                type="password"
-                fullWidth
-                required
-                variant="outlined"
-              />
-
-              <div className="flex w-full flex-row-reverse">
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{ marginLeft: "10px" }}
-                >
-                  提交
-                </Button>
-                <Button onClick={handleClose} variant="contained">
-                  取消
-                </Button>
-              </div>
-            </FormControl>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <UploadDialog
+        open={open}
+        handleClose={handleClose}
+        setCheckedActivity={setCheckedActivity}
+      />
     </div>
   );
 };

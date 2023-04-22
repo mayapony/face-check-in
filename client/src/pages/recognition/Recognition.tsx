@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import * as faceapi from "face-api.js";
 import axios from "axios";
 import { API_BASE } from "@/global";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import BlockIcon from "@mui/icons-material/Block";
 
 export const Recognition = () => {
   const videoRadio = 1280 / 720;
@@ -79,6 +81,7 @@ export const Recognition = () => {
 
     setInterval(async () => {
       setInitializing(false);
+
       if (videoRef.current && canvasRef.current) {
         const canvas = canvasRef.current;
         const displaySize = {
@@ -108,7 +111,6 @@ export const Recognition = () => {
         );
 
         results.forEach((bestMatch: FaceMatch, i: number) => {
-          console.log(bestMatch);
           const box = fullFaceDescriptions[i].detection.box;
           const text = bestMatch.toString();
           const drawBox = new faceapi.draw.DrawBox(box, { label: text });
@@ -162,6 +164,29 @@ export const Recognition = () => {
           {name}
         </h1>
       </div>
+      <ResultInfo resultType="error" />
     </div>
   );
+};
+
+export const ResultInfo = ({ resultType }: { resultType: string }) => {
+  switch (resultType) {
+    case "success":
+      return (
+        <div>
+          <CheckCircleIcon color="success" sx={{ width: 64, height: 64 }} />
+          <p className="font-bold">签到成功</p>
+        </div>
+      );
+    case "error":
+      return (
+        <div>
+          <BlockIcon color="error" sx={{ width: 64, height: 64 }} />
+          <p className="font-bold">签到失败</p>
+        </div>
+      );
+
+    default:
+      return <div>Default</div>;
+  }
 };
