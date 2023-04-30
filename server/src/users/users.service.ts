@@ -20,6 +20,7 @@ export class UsersService {
     return this.usersRepository.findOneBy({
       phoneNumber: loginUser.phoneNumber,
       password: loginUser.password,
+      isAdmin: loginUser.isAdmin,
     });
   }
 
@@ -30,7 +31,11 @@ export class UsersService {
   }
 
   findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+    return this.usersRepository.find({
+      relations: {
+        activity: true,
+      },
+    });
   }
 
   async findOne(id: number): Promise<User | null> {

@@ -1,3 +1,7 @@
+import axios from "axios";
+
+export const axiosInstance = axios.create();
+
 export const localSet = (key: string, value: string) => {
   localStorage.setItem(key, value);
 };
@@ -20,4 +24,10 @@ export const localSave = (name: string, isAdmin: number, id: number) => {
   localSet("name", name);
   localSet("role", isAdmin.toString());
   localSet("userID", id.toString());
+};
+
+export const checkUser = (needRole: string, nav: (url: string) => void) => {
+  if (needRole !== localGet("role")) {
+    nav("/login");
+  }
 };

@@ -1,13 +1,15 @@
 import { Navbar } from "@/components/layouts/navbar/navbar";
 import { API_BASE } from "@/global";
-import { localGet } from "@/utils";
-import axios from "axios";
+import { checkUser, localGet } from "@/utils";
+import { axiosInstance as axios } from "@/utils";
 import * as faceapi from "face-api.js";
 import { FaceDetection } from "face-api.js";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { UploadDialog } from "./UploadDialog";
 
 export const Upload = () => {
+  const navigate = useNavigate();
   const videoRadio = 1280 / 720;
   const videoSize = 480;
   const [initializing, setInitializing] = useState(false);
@@ -22,6 +24,7 @@ export const Upload = () => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    checkUser("0", navigate);
     initElementStyle();
     loadCheckedActivity();
   }, []);

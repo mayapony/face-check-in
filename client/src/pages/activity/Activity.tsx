@@ -36,7 +36,7 @@ const columns: GridColDef[] = [
   {
     field: "users",
     headerName: "参加用户",
-    width: 200,
+    width: 130,
     renderCell: (params) => {
       const users = params.row.users;
       console.log(users);
@@ -50,7 +50,7 @@ const columns: GridColDef[] = [
             max={3}
           >
             {users.length > 0 ? (
-              users.map((user: any) => (
+              users.map((user: { id: number; name: string }) => (
                 <Avatar key={user.id} sx={{ width: 24, height: 24 }}>
                   {user.name}
                 </Avatar>
@@ -146,6 +146,7 @@ export const Activity = () => {
         </Button>
       </div>
       <DataGrid rows={rows} columns={columns} sx={{ padding: "0 10px" }} />
+
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>添加活动</DialogTitle>
         <DialogContent sx={{ maxWidth: "400px" }}>

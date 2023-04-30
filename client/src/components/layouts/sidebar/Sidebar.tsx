@@ -11,10 +11,16 @@ import SidebarTitle from "./components/SidebarTitle";
 import EditCalendarIcon from "@mui/icons-material/CalendarViewMonth";
 import "./sidebar.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { localClear } from "@/utils";
+import { checkUser, localClear } from "@/utils";
+import { useEffect } from "react";
 
 export const Sidebar = () => {
   const nav = useNavigate();
+
+  useEffect(() => {
+    checkUser("1", nav);
+  }, []);
+
   return (
     <div className="sidebar w-60">
       <div className="top">
@@ -31,10 +37,12 @@ export const Sidebar = () => {
             </li>
           </Link>
           <SidebarTitle text="列表" />
-          <li>
-            <PersonIcon className="icon" />
-            <span>用户管理</span>
-          </li>
+          <Link to="user">
+            <li>
+              <PersonIcon className="icon" />
+              <span>用户管理</span>
+            </li>
+          </Link>
           <Link to="/activity">
             <li>
               <EditCalendarIcon className="icon" />
