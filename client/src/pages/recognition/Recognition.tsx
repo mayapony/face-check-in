@@ -15,6 +15,7 @@ export const Recognition = () => {
   const intervalIdRef = useRef<null | NodeJS.Timer>(null);
   const MODEL_URL = "/models";
   const [name, setName] = useState("");
+  const [result, setResult] = useState(false);
 
   useEffect(() => {
     initElementStyle();
@@ -77,10 +78,11 @@ export const Recognition = () => {
         new Float32Array(des.descriptors[0]),
       ]);
     });
-    console.log(labeledFaceDescriptors);
 
     setInterval(async () => {
       setInitializing(false);
+      setResult(false);
+      setName("");
 
       if (videoRef.current && canvasRef.current) {
         const canvas = canvasRef.current;
@@ -111,8 +113,13 @@ export const Recognition = () => {
         );
 
         results.forEach((bestMatch: FaceMatch, i: number) => {
-          const box = fullFaceDescriptions[i].detection.box;
           const text = bestMatch.toString();
+          const name = text.split(" ")[0];
+          console.log(text);
+          if (name === "unknown") setResult(false);
+          else setResult(true);
+          setName(name);
+          const box = fullFaceDescriptions[i].detection.box;
           const drawBox = new faceapi.draw.DrawBox(box, { label: text });
           drawBox.draw(canvas);
         });
@@ -164,7 +171,7 @@ export const Recognition = () => {
           {name}
         </h1>
       </div>
-      <ResultInfo resultType="error" />
+      <ResultInfo resultType={result ? "success" : "error"} />
     </div>
   );
 };

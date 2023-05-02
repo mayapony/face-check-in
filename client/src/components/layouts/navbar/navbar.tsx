@@ -18,6 +18,7 @@ import { blue } from "@mui/material/colors";
 import LogoutIcon from "@mui/icons-material/Logout";
 import "./navbar.scss";
 import { useNavigate } from "react-router-dom";
+import { API_BASE } from "@/global";
 
 const AdminButtonGroup = () => {
   return (
@@ -110,6 +111,7 @@ export const Navbar = ({
                   textAlign: "center",
                 }}
                 className="hover:cursor-pointer"
+                src={`${API_BASE}/${localGet("userID")}.png`}
               >
                 {localGet("name")}
               </Avatar>

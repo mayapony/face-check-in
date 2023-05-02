@@ -12,6 +12,8 @@ import { join } from 'path';
 import { ActivitysModule } from './activitys/activitys.module';
 import { ActivitysController } from './activitys/activitys.controller';
 import { Activity } from './activitys/entities/activity.entity';
+import { RecordsModule } from './records/records.module';
+import { Record } from './records/entities/record.entity';
 
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { Activity } from './activitys/entities/activity.entity';
       username: 'admin',
       password: 'admin',
       database: 'face',
-      entities: [User, Activity],
+      entities: [User, Activity, Record],
       synchronize: true,
     }),
     UsersModule,
@@ -31,6 +33,7 @@ import { Activity } from './activitys/entities/activity.entity';
       rootPath: join(__dirname, '..', 'files'),
     }),
     ActivitysModule,
+    RecordsModule,
   ],
   controllers: [AppController, UsersController, ActivitysController],
   providers: [AppService],

@@ -35,7 +35,7 @@ export class GlobalService {
 
     const labeledFaceDescriptors = await Promise.all(
       files.map(async (file) => {
-        const usename = file.split('.').at(0);
+        const name = file.split('.').at(0);
         const fileUrlPath = `https://localhost:3000/${file}`;
         console.log(fileUrlPath);
         try {
@@ -60,10 +60,10 @@ export class GlobalService {
             .withFaceLandmarks()
             .withFaceDescriptor();
           if (!fullFaceDescription) {
-            throw new Error(`no faces detected for ${usename}`);
+            throw new Error(`no faces detected for ${name}`);
           }
           const faceDescriptors = [fullFaceDescription.descriptor];
-          return new faceapi.LabeledFaceDescriptors(usename, faceDescriptors);
+          return new faceapi.LabeledFaceDescriptors(name, faceDescriptors);
         } catch (err) {
           console.log(err);
         }

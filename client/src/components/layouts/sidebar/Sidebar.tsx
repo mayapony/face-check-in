@@ -49,10 +49,12 @@ export const Sidebar = () => {
               <span>活动管理</span>
             </li>
           </Link>
-          <li>
-            <FilterFramesIcon className="icon" />
-            <span>签到记录</span>
-          </li>
+          <Link to="/record">
+            <li>
+              <FilterFramesIcon className="icon" />
+              <span>签到记录</span>
+            </li>
+          </Link>
           <SidebarTitle text="工具" />
           <li>
             <LeaderboardIcon className="icon" />

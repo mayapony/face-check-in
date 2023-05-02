@@ -6,6 +6,7 @@ import { Upload } from "@/pages/upload";
 import { Recognition } from "@/pages/recognition";
 import { Activity } from "@/pages/activity";
 import { User } from "@/pages/user/User";
+import { Record } from "@/pages/record/Record";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "/user",
         element: <User />,
+      },
+      {
+        path: "/record",
+        element: <Record />,
       },
     ],
   },

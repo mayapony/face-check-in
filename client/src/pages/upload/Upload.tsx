@@ -15,6 +15,7 @@ export const Upload = () => {
   const [initializing, setInitializing] = useState(false);
   const [haveFace, setHaveFace] = useState(false);
   const [checkedActivity, setCheckedActivity] = useState("");
+  const [isUpdated, setIsUpdated] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -27,7 +28,22 @@ export const Upload = () => {
     checkUser("0", navigate);
     initElementStyle();
     loadCheckedActivity();
+    loadUserImage();
   }, []);
+
+  const loadUserImage = () => {
+    const url = `${API_BASE}/${localGet("userID")}.png`;
+    console.log(url);
+
+    axios
+      .get(url)
+      .then((res) => {
+        if (res.status === 200) setIsUpdated(true);
+      })
+      .catch(() => {
+        setIsUpdated(false);
+      });
+  };
 
   const loadCheckedActivity = () => {
     axios
@@ -121,8 +137,9 @@ export const Upload = () => {
     }, 100);
   };
 
-  const handleUpdateImage = () => {
-    loadModels();
+  const handleUpdateImage = async () => {
+    if (isUpdated) alert("你已提交过信息");
+    else loadModels();
   };
 
   const handleStop = () => {
@@ -164,6 +181,7 @@ export const Upload = () => {
         axios.post(`${API_BASE}/users/upload`, formData).then((res) => {
           if (res.data) {
             alert("上传成功");
+            setIsUpdated(true);
             handleStop();
           }
         });
