@@ -8,16 +8,19 @@ import {
   Delete,
 } from '@nestjs/common';
 import { RecordsService } from './records.service';
-import { CreateRecordDto } from './dto/create-record.dto';
-import { UpdateRecordDto } from './dto/update-record.dto';
 
 @Controller('records')
 export class RecordsController {
   constructor(private readonly recordsService: RecordsService) {}
 
   @Post()
-  create(@Body() createRecordDto: CreateRecordDto) {
-    return this.recordsService.create(createRecordDto);
+  create() {
+    return this.recordsService.create();
+  }
+
+  @Post('sign')
+  sign(@Body() { name }: { name: string }) {
+    return this.recordsService.sign(name);
   }
 
   @Get()
@@ -31,8 +34,8 @@ export class RecordsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRecordDto: UpdateRecordDto) {
-    return this.recordsService.update(+id, updateRecordDto);
+  update(@Param('id') id: string) {
+    return this.recordsService.update(+id);
   }
 
   @Delete(':id')

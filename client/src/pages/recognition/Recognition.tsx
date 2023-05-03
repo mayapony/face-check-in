@@ -16,6 +16,7 @@ export const Recognition = () => {
   const MODEL_URL = "/models";
   const [name, setName] = useState("");
   const [result, setResult] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     initElementStyle();
@@ -83,6 +84,7 @@ export const Recognition = () => {
       setInitializing(false);
       setResult(false);
       setName("");
+      setMessage("");
 
       if (videoRef.current && canvasRef.current) {
         const canvas = canvasRef.current;
@@ -115,9 +117,32 @@ export const Recognition = () => {
         results.forEach((bestMatch: FaceMatch, i: number) => {
           const text = bestMatch.toString();
           const name = text.split(" ")[0];
-          console.log(text);
           if (name === "unknown") setResult(false);
-          else setResult(true);
+          else {
+            const postData = {
+              name,
+            };
+            axios.post(`${API_BASE}/records/sign`, postData).then((res) => {
+              const data = res.data;
+              switch (data.status) {
+                case 0:
+                  setResult(false);
+                  setMessage(data.message);
+                  break;
+                case 1:
+                  setResult(false);
+                  setMessage(data.message);
+                  break;
+                case 2:
+                  setResult(true);
+                  setMessage("");
+                  break;
+                default:
+                  setResult(false);
+                  setMessage("");
+              }
+            });
+          }
           setName(name);
           const box = fullFaceDescriptions[i].detection.box;
           const drawBox = new faceapi.draw.DrawBox(box, { label: text });
@@ -171,12 +196,18 @@ export const Recognition = () => {
           {name}
         </h1>
       </div>
-      <ResultInfo resultType={result ? "success" : "error"} />
+      <ResultInfo resultType={result ? "success" : "error"} message={message} />
     </div>
   );
 };
 
-export const ResultInfo = ({ resultType }: { resultType: string }) => {
+export const ResultInfo = ({
+  resultType,
+  message = "",
+}: {
+  resultType: string;
+  message: string;
+}) => {
   switch (resultType) {
     case "success":
       return (
@@ -187,9 +218,9 @@ export const ResultInfo = ({ resultType }: { resultType: string }) => {
       );
     case "error":
       return (
-        <div>
+        <div className="flex flex-col items-center justify-center">
           <BlockIcon color="error" sx={{ width: 64, height: 64 }} />
-          <p className="font-bold">签到失败</p>
+          <p className="font-bold">签到失败{message}</p>
         </div>
       );
 

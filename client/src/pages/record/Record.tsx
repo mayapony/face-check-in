@@ -4,7 +4,34 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { AddUserButton } from "../user/AddUserButton";
 
-const columns: GridColDef[] = [{ field: "id", headerName: "ID", width: 70 }];
+const columns: GridColDef[] = [
+  { field: "id", headerName: "ID", width: 70 },
+  {
+    field: "user",
+    headerName: "用户名",
+    width: 140,
+    valueGetter: (params) => {
+      return params.row.user.name;
+    },
+  },
+  {
+    field: "activity",
+    headerName: "活动名称",
+    width: 140,
+    valueGetter: (params) => {
+      return params.row.activity.name;
+    },
+  },
+  {
+    field: "createDate",
+    headerName: "签到时间",
+    width: 200,
+    valueGetter: (params) => {
+      const date = new Date(params.row.createDate);
+      return date.toLocaleString();
+    },
+  },
+];
 
 export const Record = () => {
   const [rows, setRows] = useState([]);
@@ -16,6 +43,7 @@ export const Record = () => {
   const retriveData = () => {
     axios.get(`${API_BASE}/records`).then((res) => {
       if (res.data) {
+        console.log(res.data);
         setRows(res.data);
       }
     });
